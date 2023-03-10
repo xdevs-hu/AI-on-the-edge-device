@@ -35,6 +35,10 @@
 #ifdef ENABLE_MQTT
     #include "server_mqtt.h"
 #endif //ENABLE_MQTT
+#ifdef ENABLE_GATT
+    #include "service_gatt.h"
+#endif //ENABLE_GATT
+
 //#include "Helper.h"
 #include "../../include/defines.h"
 //#include "server_GPIO.h"
@@ -288,11 +292,6 @@ extern "C" void app_main(void)
     LogFile.WriteToFile(ESP_LOG_INFO, TAG, "================== Main Started =================");
     LogFile.WriteToFile(ESP_LOG_INFO, TAG, "=================================================");
 
-    if (getHTMLcommit().substr(0, 7) != std::string(GIT_REV).substr(0, 7)) { // Compare the first 7 characters of both hashes
-        LogFile.WriteToFile(ESP_LOG_WARN, TAG, std::string("Web UI version (") + getHTMLcommit() + ") does not match firmware version (" + std::string(GIT_REV) + ") !");
-        LogFile.WriteToFile(ESP_LOG_WARN, TAG, "Please make sure to setup the SD-Card properly (check the documentation) or re-install using the AI-on-the-edge-device__update__*.zip!");    
-    }
-
     std::string zw = getCurrentTimeString("%Y%m%d-%H%M%S");
     ESP_LOGD(TAG, "time %s", zw.c_str());
     
@@ -301,6 +300,14 @@ extern "C" void app_main(void)
     heap_trace_dump(); 
 #endif  
 
+#ifdef ENABLE_GATT
+    LogFile.WriteToFile(ESP_LOG_INFO, TAG, "Starting GATT advertising service");
+    bool started = gattService_startAdvertising();
+    if (!started) {
+        LogFile.WriteToFile(ESP_LOG_WARN, TAG, "BLE advertising init failed!");
+    }
+#endif //ENABLE_GATT
+    
     /* Check if PSRAM can be initalized */
     esp_err_t ret;
     ret = esp_spiram_init();
