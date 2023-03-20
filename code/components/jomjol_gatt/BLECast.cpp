@@ -122,16 +122,12 @@ bool BLECast::begin()
     return _init_gap();
 }
 
-void BLECast::setManufacturerData(char* payload, uint8_t len) {
+void BLECast::extendDeviceName(std::string payload) {
     char nameHeader[2];
-    nameHeader[0] = local_name.length() + 1;
+    nameHeader[0] = local_name.length() + 1 + payload.length();
     nameHeader[1] = ESP_BLE_AD_TYPE_NAME_CMPL;  // 0x09
 
-    char manufacturerDataHeader[2];
-    std::string data(payload, len);
-    manufacturerDataHeader[0] = data.length() + 1;
-    manufacturerDataHeader[1] = ESP_BLE_AD_MANUFACTURER_SPECIFIC_TYPE;  // 0xff
-    setAdvData(std::string(nameHeader, 2) + local_name + std::string(manufacturerDataHeader, 2) + data);
+    setAdvData(std::string(nameHeader, 2) + local_name + payload);
 
     if (running) {
         esp_ble_gap_config_adv_data_raw((uint8_t*)m_payload.data(), m_payload.length());

@@ -16,11 +16,7 @@
 #ifndef _BLE_CAST_H_
 #define _BLE_CAST_H_
 
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
 #include <string>
-#include <cstring>
 
 class BLECast {
     public:
@@ -28,7 +24,7 @@ class BLECast {
         ~BLECast(void);
 
         bool begin();
-        void setManufacturerData(char* payload, uint8_t len);
+        void extendDeviceName(std::string payload);
         void end(void);
     private:
         bool _init_gap();

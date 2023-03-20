@@ -13,6 +13,10 @@
 #include "esp_log.h"
 #include "../../include/defines.h"
 
+#ifdef ENABLE_GATT
+    #include "service_gatt.h"
+#endif //ENABLE_GATT
+
 static const char* TAG = "POSTPROC";
 
 std::string ClassFlowPostProcessing::getNumbersName()
@@ -912,6 +916,11 @@ bool ClassFlowPostProcessing::doFlow(string zwtime)
 
         NUMBERS[j]->ErrorMessageText = "no error";
         UpdatePreValueINI = true;
+
+        #ifdef ENABLE_GATT
+           // update BLE advertising value if everything is OK (no error)
+           gattServer_setMeterValue(NUMBERS[j]->ReturnValue);
+        #endif //ENABLE_GATT
 
         string _zw = NUMBERS[j]->name + ": Raw: " + NUMBERS[j]->ReturnRawValue + ", Value: " + NUMBERS[j]->ReturnValue + ", Status: " + NUMBERS[j]->ErrorMessageText;
         LogFile.WriteToFile(ESP_LOG_INFO, TAG, _zw);
